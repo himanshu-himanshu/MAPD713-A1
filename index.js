@@ -1,17 +1,15 @@
 const express = require("express");
 const app = express();
-//var router = express.Router();
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+require("dotenv").config();
+
 const PORT = 8080;
-const HOST = "127.0.0.1";
-const MONGODB_COMPASS =
-  "mongodb+srv://gangwar0145:xxGTyguBt2EnatV5@cluster0.mmynjns.mongodb.net/?retryWrites=true&w=majority";
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-mongoose.connect(MONGODB_COMPASS, { useNewUrlParser: true });
+mongoose.connect(process.env.MONGODB_COMPASS_URL, { useNewUrlParser: true });
 
 var conn = mongoose.connection;
 
@@ -45,6 +43,8 @@ var picSchema = new mongoose.Schema({
 const Picture = mongoose.model("Picture", picSchema);
 
 app.get("/images", (req, res) => {
+  console.log("> Images GET: recieved request");
+  console.log("< Images GET: sending response");
   Picture.find()
     .then((pics) => {
       if (pics.length == 0) {
@@ -58,6 +58,8 @@ app.get("/images", (req, res) => {
 });
 
 app.post("/images", (req, res, next) => {
+  console.log("> Images POST: recieved request");
+  console.log("< Images POST: sending response");
   let newPicture = {
     id: req.body.id,
     name: req.body.name,
@@ -74,6 +76,8 @@ app.post("/images", (req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is listening at http://${HOST}:${PORT}`);
-  console.log(`Endpoints: http://${HOST}/images method: GET, POST`);
+  console.log(`Server is listening at http://${process.env.HOST}:${PORT}`);
+  console.log(
+    `Endpoints: http://${process.env.HOST}/images method: GET, POST, DELETE`
+  );
 });
