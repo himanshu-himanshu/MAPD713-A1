@@ -4,8 +4,6 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 require("dotenv").config();
 
-const PORT = 8080;
-
 var GET_COUNTER = 0;
 var POST_COUNTER = 0;
 
@@ -17,7 +15,7 @@ mongoose.connect(process.env.MONGODB_COMPASS_URL, { useNewUrlParser: true });
 var conn = mongoose.connection;
 
 conn.on("connected", function () {
-  console.log("database is connected successfully");
+  console.log("Database is connected successfully");
 });
 conn.on("disconnected", function () {
   console.log("database is disconnected successfully");
@@ -55,7 +53,7 @@ app.get("/images", (req, res) => {
   Picture.find()
     .then((pics) => {
       if (pics.length == 0) {
-        return res.send("No Images Founded");
+        return res.status(200).send("No Images Founded");
       }
       res.send(pics);
     })
@@ -81,17 +79,29 @@ app.post("/images", (req, res, next) => {
   new Picture(newPicture)
     .save()
     .then((result) => {
-      res.send(201, result);
+      res.status(201).send(result);
     })
     .catch((err) => console.log("Error:", err));
 });
 
-app.delete();
+app.delete("/images", (req, res) => {
+  console.log("> Images DELETE: recieved request");
+  console.log("< Images DELETE: sending response");
 
-app.listen(PORT, () => {
-  console.log(`Server is listening at http://${process.env.HOST}:${PORT}`);
+  Picture.deleteMany({})
+    .then((result) => {
+      res.send("Deletion Completed!");
+      return result;
+    })
+    .catch((err) => console.log("Error:", err));
+});
+
+app.listen(process.env.DEFAULT_PORT, () => {
   console.log(
-    `Endpoints: http://${process.env.HOST}/images method: GET, POST, DELETE`
+    `Server is listening at http://${process.env.HOST}:${process.env.DEFAULT_PORT}`
+  );
+  console.log(
+    `Endpoints: http://${process.env.HOST}/images \nMethods: GET, POST, DELETE`
   );
   console.log(
     `Processed Request Count --> Get: ${GET_COUNTER} ,Post: ${POST_COUNTER}`
