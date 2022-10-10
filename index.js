@@ -6,6 +6,9 @@ require("dotenv").config();
 
 const PORT = 8080;
 
+var GET_COUNTER = 0;
+var POST_COUNTER = 0;
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -43,8 +46,12 @@ var picSchema = new mongoose.Schema({
 const Picture = mongoose.model("Picture", picSchema);
 
 app.get("/images", (req, res) => {
+  GET_COUNTER++;
   console.log("> Images GET: recieved request");
   console.log("< Images GET: sending response");
+  console.log(
+    `Processed Request Count --> Get: ${GET_COUNTER} ,Post: ${POST_COUNTER}`
+  );
   Picture.find()
     .then((pics) => {
       if (pics.length == 0) {
@@ -58,8 +65,12 @@ app.get("/images", (req, res) => {
 });
 
 app.post("/images", (req, res, next) => {
+  POST_COUNTER++;
   console.log("> Images POST: recieved request");
   console.log("< Images POST: sending response");
+  console.log(
+    `Processed Request Count --> Get: ${GET_COUNTER} ,Post: ${POST_COUNTER}`
+  );
   let newPicture = {
     id: req.body.id,
     name: req.body.name,
@@ -75,9 +86,14 @@ app.post("/images", (req, res, next) => {
     .catch((err) => console.log("Error:", err));
 });
 
+app.delete();
+
 app.listen(PORT, () => {
   console.log(`Server is listening at http://${process.env.HOST}:${PORT}`);
   console.log(
     `Endpoints: http://${process.env.HOST}/images method: GET, POST, DELETE`
+  );
+  console.log(
+    `Processed Request Count --> Get: ${GET_COUNTER} ,Post: ${POST_COUNTER}`
   );
 });
